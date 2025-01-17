@@ -1,0 +1,26 @@
+name: Deploy to production server via ftp
+on: workflow_dispatch
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: node --version
+      - run: npm --version
+      - uses: actions/checkout@v4
+      - name: Install node dependencies
+        working-directory: ./my-app
+        run: npm install
+      - name: build application
+        working-directory: ./my-app
+        run: npm run build
+        env:
+          CI: false
+
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ftp.nandoerni.com
+          username: ${{ secrets.PROD_FTP_USERNAME }}
+          password: ${{ secrets.PROD_FTP_PASSWORD }}
+          local-dir: "my-app/build/"
+          server-dir: "/"
